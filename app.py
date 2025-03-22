@@ -25,7 +25,7 @@ if uploaded_file:
     df["Delivery_person_Ratings"] = pd.to_numeric(df["Delivery_person_Ratings"], errors="coerce")
 
     # Remove "(min)" from Time_taken(min) and convert to integer
-    df["Time_taken(min)"] = df["Time_taken(min)"].str.extract("(\\d+)").astype(float)
+    df["Time_taken(min)"] = pd.to_numeric(df["Time_taken(min)"].str.extract("(\\d+)")[0], errors="coerce")
 
     # Fix Weatherconditions (remove "conditions ")
     df["Weatherconditions"] = df["Weatherconditions"].str.replace("conditions ", "", regex=True)
@@ -74,12 +74,15 @@ if uploaded_file:
     elif page == "Clustering Analysis":
         st.subheader("🌀 Clustering Analysis of Delivery Times")
         features = ["Time_taken(min)", "Delivery_person_Age", "Delivery_person_Ratings"]
-        X = df[features]
-
+        df_clustering = df[features].copy()
+        
         # Ensure all features are numeric and contain no missing values
-        if X.isnull().sum().sum() == 0:
+        df_clustering = df_clustering.apply(pd.to_numeric, errors='coerce')
+        df_clustering.dropna(inplace=True)
+
+        if df_clustering.isnull().sum().sum() == 0:
             scaler = StandardScaler()
-            X_scaled = scaler.fit_transform(X)
+            X_scaled = scaler.fit_transform(df_clustering)
             kmeans = KMeans(n_clusters=3, random_state=42)
             df["Cluster"] = kmeans.fit_predict(X_scaled).astype(int)  # Convert cluster labels to int
 
