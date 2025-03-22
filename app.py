@@ -24,7 +24,7 @@ if uploaded_file:
     df["Delivery_person_Ratings"] = pd.to_numeric(df["Delivery_person_Ratings"], errors="coerce")
 
     # Remove "(min)" from Time_taken(min) and convert to integer
-    df["Time_taken(min)"] = df["Time_taken(min)"].str.extract("(\\d+)").astype(int)
+    df["Time_taken(min)"] = df["Time_taken(min)"].str.extract("(\\d+)").astype(float)
 
     # Fix Weatherconditions (remove "conditions ")
     df["Weatherconditions"] = df["Weatherconditions"].str.replace("conditions ", "", regex=True)
@@ -32,6 +32,9 @@ if uploaded_file:
     # Convert time columns to datetime format
     df["Time_Orderd"] = pd.to_datetime(df["Time_Orderd"], errors="coerce")
     df["Time_Order_picked"] = pd.to_datetime(df["Time_Order_picked"], errors="coerce")
+
+    # Handle missing values by dropping or filling them
+    df.dropna(inplace=True)  # Remove rows with missing values
 
     st.sidebar.success("✅ Data Loaded Successfully!")
 
