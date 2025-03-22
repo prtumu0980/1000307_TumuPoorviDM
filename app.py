@@ -34,8 +34,9 @@ if uploaded_file:
     df["Time_Orderd"] = pd.to_datetime(df["Time_Orderd"], errors="coerce")
     df["Time_Order_picked"] = pd.to_datetime(df["Time_Order_picked"], errors="coerce")
 
-    # Handle missing values by filling them with median values
-    df.fillna(df.median(), inplace=True)
+    # Handle missing values only for numeric columns
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].median())
     
     # Ensure no infinite values exist
     df.replace([np.inf, -np.inf], np.nan, inplace=True)
